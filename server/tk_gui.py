@@ -97,7 +97,7 @@ def start_push_stream():
     print(f'进入目录:{os.getcwd()}')
     os.chdir(root_dir / 'mediamtx')
     process_for_rtsp_server = subprocess.Popen(['mediamtx.exe'],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    time.sleep(1)
+    time.sleep(0.5)
     os.chdir(root_dir)
     print(f'进入目录2:{os.getcwd()}')
     process_for_push_stream = subprocess.Popen(['utils_server.exe'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True)
@@ -105,7 +105,7 @@ def start_push_stream():
     flag = 1
     # Print video message
     Thread(target=output_video_msg,daemon=True,args=(process_for_push_stream.stderr,)).start()
-
+    time.sleep(0.5)
     # update_fps() # update when flag ==1
     print(f'rtsp server pid : {process_for_rtsp_server.pid}')
     print(f'cam and push stream pid : {process_for_push_stream.pid}')
@@ -122,6 +122,7 @@ def close_push_stream():
     try:
         flag = 0
         # 1. 释放video 2.关闭所有进程 3.释放stdout stderr 
+        video.release()
         print(f'flag={flag}')
         # process_for_push_stream.kill()
         # process_for_rtsp_server.kill()
@@ -131,7 +132,7 @@ def close_push_stream():
         os.system('taskkill /f /im %s' % 'mediamtx.exe')
         process_for_push_stream = None
         process_for_rtsp_server = None
-        # video.release()
+
         button_start['state'] = 'normal'
         button_show['state'] = 'disabled'
         button_close['state'] = 'disabled'
