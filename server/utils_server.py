@@ -26,8 +26,6 @@ ip_address = socket.gethostbyname(socket.gethostname())
 port= 8554
 rtsp_server_url = f"rtsp://{ip_address}:{port}/mystream"
 
-
-
 # Function
 def push_stream():
     stream = CamGear(source=0).start()
@@ -48,19 +46,11 @@ def push_stream():
         if frame is None:
             break
         # {do something with the frame here}
-
-        # 携带元数据
-        frame = cv2.putText(frame, "WriteGear is Cool!", (10, 40),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        # frame = cv2.putText(frame, "WriteGear is Cool!", (10, 40),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
         
-        # 通过流传输QP，writeGear
-
         # write frame to writer
         writer.write(frame)
-        # sys.stdout.flush()
-        # Show output window for test
-        # cv2.imshow("Output Frame", frame)
-        # yield frame 
-        # check for 'q' key if pressed
+
         key = cv2.waitKey(1) & 0xFF
         if key == ord("q"):
             break
