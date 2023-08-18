@@ -1,0 +1,8 @@
+/server/mediamtx
+__pycache__/
+/utils_server.dist/
+/utils_server.build/
+mediamtx 
+build 
+dist
+test*.py 
