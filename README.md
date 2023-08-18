@@ -122,7 +122,7 @@ subprocess 执行时候，如果使用了shell参数，再杀进程时候是杀�
 
 | 指标        | 简单解释                                                     |
 | ----------- | ------------------------------------------------------------ |
-| 量化参数 QP | Quantizer Parameter，量化参数，反映了空间细节压缩情况。值越小，量化越精细，图像质量越高，产生的码流也越长。如QP小，大部分的细节都会被保留；QP增大，一些细节丢失，码率降低，但图像失真加强和质量下降。为了兼顾传输效率与视频质量，QP一般为20-25。[QP参数解析]([量化参数 quantization parameter以及HEVC中QP详解_liangjiubujiu的博客-CSDN博客](https://blog.csdn.net/liangjiubujiu/article/details/80569391)) |
+| 量化参数 QP | Quantizer Parameter，量化参数，反映了空间细节压缩情况。值越小，量化越精细，图像质量越高，产生的码流也越长。如QP小，大部分的细节都会被保留；QP增大，一些细节丢失，码率降低，但图像失真加强和质量下降。为了兼顾传输效率与视频质量，QP一般为20-2 [QP参数解析](https://blog.csdn.net/liangjiubujiu/article/details/80569391) |
 |             |                                                              |
 
 
