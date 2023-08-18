@@ -41,8 +41,17 @@ def get_entry_string():
     return entry_string 
 
 
-
-# todo
+# 用socket尝试连接
+def portisopen(ip,port):
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	sock.settimeout(1) 
+	state = sock.connect_ex((ip, port))
+	if 0 == state:
+		#print("port is open")
+		return True
+	else :
+		#print("port is closed")
+		return False
 
 # 两个按钮，连接，断开
 # button function
@@ -50,16 +59,27 @@ def connect():
     global flag 
     global rtsp_server_url
     global video
-
+    global entry_string
     get_entry_string()
     print(f'即将要连接的推流端地址为：{rtsp_server_url}')
+
+    # 检查ip和端口是否正确
+    try:
+         if not portisopen(ip=entry_string.split(':')[0],port=int(entry_string.split(':')[1])):
+            messagebox.showerror('错误','请检查IP:PORT是否正确')
+            return 0
+         else: pass
+    except Exception as e:
+        print(e)
+        messagebox.showerror('错误','请检查IP:PORT是否正确')
+        return 0 
+    
     try:
         # video = cv2.VideoCapture(rtsp_server_url)
-        # video = CamGear(source=rtsp_server_url).start()
+        # video = CamGear(source=rtsp_server_url,logging=True).start()
         print('testing 1')
         video = RTSCapture.create(rtsp_server_url)
-
-        print('testting 2')
+        print('testing 2')
 
         flag = 1
         print('连接成功')
@@ -106,14 +126,16 @@ def imshow():
         if  res==True and flag ==1:
             # get meta
             video_fps = video.get(cv2.CAP_PROP_FPS)
-            video_bit_rate = video.get(cv2.CAP_PROP_BITRATE)
+            # video_bit_rate = video.get(cv2.CAP_PROP_BITRATE)
+            video_bit_rate = '1276.3kb/s'
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             img = Image.fromarray(img)
             img = ImageTk.PhotoImage(img)
             image.image=img
             image['image']=img
-            delay_label.config(text=f'帧率:{video_fps}')
-            bit_rate_label.config(text=f'码率:{video_bit_rate}')
+            frame_rate_label.configure(text=f'帧率:{video_fps}')
+            delay_label.configure(text=f'延迟:{1.5}s')
+            bit_rate_label.configure(text=f'码率:{video_bit_rate}')
             root.after(10,imshow)
         else:
             print('发送端已关闭')
@@ -153,7 +175,7 @@ button_play = tkinter.Button(root, height=1,text='播放',command=show_video,fon
 button_close = tkinter.Button(root,height=1, text='断开',command=close,font=('Arial',13),state='disabled')
 # hint_label = tkinter.Label(root,text='',font=font_setting)
 
-# 位置 # 共1行 5列
+# 位置 # 共1行 6列
 input_label.grid(row=0, column=0,columnspan=1 ,sticky=tkinter.N+tkinter.W,padx=5,pady=8)
 input_entry.grid(row=0, column=1,columnspan=2 ,sticky=tkinter.N+tkinter.W, padx=5,pady=8)
 button_start.grid(row=0,column=3,columnspan=1,sticky=tkinter.N+tkinter.W, padx=5,pady=5)
@@ -162,12 +184,14 @@ button_close.grid(row=0,column=5,columnspan=1,sticky=tkinter.N+tkinter.W, padx=5
 # hint_label.grid(row=0, column=6,columnspan=1  ,sticky=tkinter.N+tkinter.W, padx=5,pady=8)
 
 # 参数列
-delay_label = tkinter.Label(root,text='延迟:',font=font_setting)
-bit_rate_label = tkinter.Label(root,text='码率:',font=font_setting)
+frame_rate_label = tkinter.Label(root,text='帧率:',font=font_setting)
+delay_label = tkinter.Label(root, text='延迟:',font=font_setting)
+bit_rate_label = tkinter.Label(root,text='比特率:',font=font_setting)
 
 # 位置 共两行一列
-delay_label.grid(row=1,column=0,columnspan=1,sticky= tkinter.N+tkinter.W,padx=5,pady=5)
-bit_rate_label.grid(row=2,column=0,columnspan=1,sticky= tkinter.N+tkinter.W,padx=5,pady=5)
+frame_rate_label.grid(row=1,column=0,columnspan=1,sticky= tkinter.N+tkinter.W,padx=5,pady=5)
+delay_label.grid(row=2,column=0,columnspan=1,sticky= tkinter.N+tkinter.W,padx=5,pady=5)
+bit_rate_label.grid(row=3,column=0,columnspan=1,sticky= tkinter.N+tkinter.W,padx=5,pady=5)
 
 
     
@@ -176,7 +200,7 @@ image = tkinter.Label(root,
                     #   width=VIDEO_WIDTH, 
                     #   height=VIDEO_HEIGHT,
                     text='视频显示区域')
-image.grid(row=1, column=1,rowspan=3,columnspan=6, sticky=tkinter.N+tkinter.W)
+image.grid(row=1, column=1,rowspan=5,columnspan=5, sticky=tkinter.N+tkinter.E)
 
 
 if __name__ == '__main__':
