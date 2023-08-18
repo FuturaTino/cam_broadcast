@@ -40,7 +40,6 @@ def get_entry_string():
     # hint_label.configure(text=entry_string)
     return entry_string 
 
-
 # 用socket尝试连接
 def portisopen(ip,port):
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -126,15 +125,16 @@ def imshow():
         if  res==True and flag ==1:
             # get meta
             video_fps = video.get(cv2.CAP_PROP_FPS)
+            video_delay = 'N/A'
             # video_bit_rate = video.get(cv2.CAP_PROP_BITRATE)
-            video_bit_rate = '1276.3kb/s'
+            video_bit_rate = 'N/A'
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             img = Image.fromarray(img)
             img = ImageTk.PhotoImage(img)
             image.image=img
             image['image']=img
             frame_rate_label.configure(text=f'帧率:{video_fps}')
-            delay_label.configure(text=f'延迟:{1.5}s')
+            delay_label.configure(text=f'延迟:{video_delay}s')
             bit_rate_label.configure(text=f'码率:{video_bit_rate}')
             root.after(10,imshow)
         else:
