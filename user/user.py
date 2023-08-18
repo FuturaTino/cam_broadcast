@@ -25,6 +25,8 @@ frame_rate = 0
 root_dir = Path(os.getcwd()) # cam_broadcast目录
 
 video = None
+video_fps = 0.
+video_bit_rate = 0.
 entry_string = ''
 rtsp_server_url = ''
 font_setting = ('Arial', 15)
@@ -48,16 +50,17 @@ def connect():
     global flag 
     global rtsp_server_url
     global video
+
     get_entry_string()
     print(f'即将要连接的推流端地址为：{rtsp_server_url}')
     try:
         # video = cv2.VideoCapture(rtsp_server_url)
         # video = CamGear(source=rtsp_server_url).start()
-        print('testing here')
+        print('testing 1')
         video = RTSCapture.create(rtsp_server_url)
+
         print('testting 2')
-        
-        video.start_read()
+
         flag = 1
         print('连接成功')
         button_start['state']='disabled'
@@ -70,15 +73,22 @@ def connect():
 
 def close():
     global flag 
+    global video
     # video.release()
     
     # rtscapture
-    video.stop_read()
-
+    if video.isOpened():
+        print(f'释放video')
+        video.stop_read() # stop rtpcapture read thread
+        video.release()
     # camgear
     # video.stop()
     flag = 0
     print('关闭成功')
+    # 清空stdout
+    del video
+    sys.stdout.flush()
+    sys.stderr.flush()
     button_start['state']='normal'
     button_play['state']='disabled'
     button_close['state']='disabled'
@@ -89,27 +99,39 @@ def imshow():
     global video
     global root
     global image
-    _,img = video.read()
+    global video_fps
+    global video_bit_rate
+    try:
+        res ,img = video.read() # 容易出错,video.release()后，再次调用read()会报错
+        if  res==True and flag ==1:
+            # get meta
+            video_fps = video.get(cv2.CAP_PROP_FPS)
+            video_bit_rate = video.get(cv2.CAP_PROP_BITRATE)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img = Image.fromarray(img)
+            img = ImageTk.PhotoImage(img)
+            image.image=img
+            image['image']=img
+            delay_label.config(text=f'帧率:{video_fps}')
+            bit_rate_label.config(text=f'码率:{video_bit_rate}')
+            root.after(10,imshow)
+        else:
+            print('发送端已关闭')
+            image.config(text='发送端已关闭')
+            return 0
+    except Exception as e:
+        print('推送端未开启或已关闭')
     # res,img=video.read()
-    if  flag ==1:
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img = Image.fromarray(img)
-        img = ImageTk.PhotoImage(img)
-        image.image=img
-        image['image']=img
-        root.after(10,imshow)
-    else:
-        print('发送端已关闭')
-        image.config(text='发送端已关闭')
-        return 0
+
 # 断开，video.release() , 
 
 def show_video():
     global video
     global flag
     if flag ==1:
+        video.start_read()  # rtscapture
         imshow()
-        
+  
         # button state
         button_start['state'] = 'disabled'
         button_play['state'] = 'disabled'
