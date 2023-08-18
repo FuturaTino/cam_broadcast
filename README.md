@@ -12,7 +12,36 @@ todo:
 - [x] 接收端 - 获取推流画面
 - [ ] 接收端- 布置user段，布置两个label，计算变量
 
+# 快速开始
 
+**启动发送端**
+
+在项目目录下启动cmd命令行
+
+```shell
+pip install -r requrements.txt 
+```
+
+
+
+```shell
+#目录切换到server文件夹，启动推送端GUI
+cd  server
+python sk_gui.py
+```
+
+
+
+查询本机的ip地址
+
+打开cmd，查询本机的内网ipv4地址，tcp转rtp包的端口已固定为`8554`
+
+```
+查询ip地址命令
+ipconfig
+```
+
+推流地址为 `rtsp://192.168.37.16:8554/mystream` 将该ip换为你的ip即可。
 
 # 任务目标
 
@@ -99,6 +128,8 @@ todo:
 
 - Python的线程库
 - 可以用来实现多线程采集和推流
+
+
 
 
 # 评价指标
