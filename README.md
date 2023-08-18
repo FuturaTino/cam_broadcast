@@ -2,14 +2,12 @@
 
 todo:
 
-8.16
-
 - [x] 配置环境 conda 库
 - [x] 制作发送端和RTSP服务器，先用mediamtx作为暂时的RTSP服务器。
-- [ ] 分解第二目标。
+- [x] 分解第二目标。
 - [x] 发送端 - cv2摄像头采集画面
 - [x] 发送端 - 对视频进行编码
-- [ ] 发送端 - tkinter布局，计算各个变量，绑定按钮事件
+- [x] 发送端 - tkinter布局，计算各个变量，绑定按钮事件
 - [x] 发送端 - vidgear用RTSP协议推流h.265视频流，将推流画面置换摄像头采集画面
 - [x] 接收端 - 获取推流画面
 - [ ] 接收端- 布置user段，布置两个label，计算变量
@@ -27,12 +25,16 @@ todo:
 
 ## 大致思路
 
-1. 发送端采集摄像头视频画面
-2. 对视频进行编码处理
-3. 推流到RMTP服务器
+1. cv2发送端采集摄像头视频画面
+2. ffmpeg对视频进行编码处理
+3. 推流到mediaMTX打包
 4. 接受端拉流
 
 
+
+![image-20230818112007241](https://github.com/FuturaTino/TyporaImages/raw/main//TyporaImages/image-20230818112007241.png)
+
+![image-20230818112038978](https://github.com/FuturaTino/TyporaImages/raw/main//TyporaImages/image-20230818112038978.png)
 
 ## 分解步骤
 
@@ -47,7 +49,7 @@ todo:
 3. 对采集到的帧进行h265编码（可以用OpenCV或者FFmpeg进行编码）
 4. 创建vidgear的StreamGear对象,指定推流参数中协议为为RTSP（steamGear或 WriteGear）
 5. 在循环中不断读取编码后的视频帧,并用StreamGear推送RTSP流
-6. 推流地址为RTSP服务器,比如 **mediaMXT**、SRS（最好）、Wowza或Nginx
+6. 推流地址为RTSP服务器,比如 mediaMXT、SRS（最好）、Wowza或Nginx
 7. 添加组件
 
 **接收端:**
@@ -58,12 +60,6 @@ todo:
 4. 在循环中读取StreamGear的帧数据
 5. 将解码后的帧显示到OpenCV窗口或Tkinter界面上
 6. 添加控制按钮等界面组件
-
-这样就可以通过vidgear库支持,基于RTSP协议实现推拉流。可以根据需要调整编码参数、UI display等。
-
-主要利用Python的cv2、vidgear等库来实现视频处理和传输流水线。
-
-
 
 
 
@@ -127,7 +123,7 @@ subprocess 执行时候，如果使用了shell参数，再杀进程时候是杀�
 | 指标        | 简单解释                                                     |
 | ----------- | ------------------------------------------------------------ |
 | 量化参数 QP | Quantizer Parameter，量化参数，反映了空间细节压缩情况。值越小，量化越精细，图像质量越高，产生的码流也越长。如QP小，大部分的细节都会被保留；QP增大，一些细节丢失，码率降低，但图像失真加强和质量下降。为了兼顾传输效率与视频质量，QP一般为20-25。[QP参数解析]([量化参数 quantization parameter以及HEVC中QP详解_liangjiubujiu的博客-CSDN博客](https://blog.csdn.net/liangjiubujiu/article/details/80569391)) |
-| 帧率FPS     | Frame per second ， 帧率，每秒播放帧的数量。                 |
+|             |                                                              |
 
 
 
