@@ -1,13 +1,15 @@
+import socket
+
 # for ffmpeg
 
 # rtsp settings
-rtsp_server_ip = "192.168.31.17"
+rtsp_server_ip = socket.gethostbyname(socket.gethostname())
 rtsp_server_port = "8554"
 rtsp_server_url = f"rtsp://{rtsp_server_ip}:{rtsp_server_port}/mystream"
 
 rtp_server_url = f"rtp://{rtsp_server_ip}:8000/mystream"
 # rtsp_server_url = rtsp://192.168.31.17:8554/mystream
-
+print(rtsp_server_url)
 # ffmpeg Push stream settings
 stream_params = {
     "-f" : "rtsp",

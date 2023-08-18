@@ -8,12 +8,14 @@ import sys
 from threading import Thread
 from pathlib import Path
 import subprocess
+import socket 
 import re
 from multiprocessing import Process
 import os 
 from vidgear.gears import CamGear
 from rtscapture import RTSCapture
 # Meta
+native_ip = socket.gethostbyname(socket.gethostname())
 flag = 0 #关闭拉流
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 500
@@ -123,7 +125,7 @@ root.title('接受端')
 
 # 输入框 + 按钮，输入框手动输入ip地址和端口号，按钮用于连接
 input_label = tkinter.Label(root,text= '推送端 IP:PORT',font=font_setting)
-input_entry = tkinter.Entry(root, width=30, textvariable=tkinter.StringVar(value='192.168.31.17:8554'),font=font_setting)
+input_entry = tkinter.Entry(root, width=30, textvariable=tkinter.StringVar(value=f'{native_ip}:8554'),font=font_setting)
 button_start = tkinter.Button(root, height=1,text='连接',command=connect,font=('Arial', 13))
 button_play = tkinter.Button(root, height=1,text='播放',command=show_video,font=('Arial', 13),state='disabled')
 button_close = tkinter.Button(root,height=1, text='断开',command=close,font=('Arial',13),state='disabled')
