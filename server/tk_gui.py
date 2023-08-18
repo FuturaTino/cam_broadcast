@@ -134,7 +134,8 @@ def close_push_stream():
     try:
         flag = 0
         # 1. 释放video 2.关闭所有进程 3.释放stdout stderr 
-        video.release()
+        if video is not None:
+            video.release()
         print(f'flag={flag}')
         # process_for_push_stream.kill()
         # process_for_rtsp_server.kill()
