@@ -2,7 +2,7 @@ import cv2
 import threading
 import sys
 import time
-# 双线程读取视频流。 
+# 开线程读取视频流，减少延迟 
 class RTSCapture(cv2.VideoCapture):
     _cur_frame = None
     _reading = False

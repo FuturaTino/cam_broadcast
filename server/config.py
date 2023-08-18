@@ -14,8 +14,8 @@ stream_params = {
     "-rtsp_transport": "tcp",
     "-vcodec": "libx265", # define custom Video encoder h.265 
     # "-bufsize": "2000k", 
-    "-threads": "2",
-    "-tune" : "zerolatency" # for low latency
+    # "-threads": "2",
+    # "-tune" : "zerolatency" # for low latency
 }
 
 stream_params2 = {

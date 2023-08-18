@@ -12,6 +12,7 @@ import re
 from multiprocessing import Process
 from utils_server import push_stream
 import os 
+from rtscapture import RTSCapture
 
 from rtscapture import RTSCapture
 from config import rtsp_server_url
@@ -45,7 +46,7 @@ def output_video_msg(pipe:subprocess.PIPE):
         line = pipe.readline()
         if line.startswith('frame'):
             meta = line.split('=')
-            print(meta)
+            # print(meta)
             try:
                 meta_dict = {
                     'frame':meta[1].split(' ')[-2],
@@ -135,7 +136,11 @@ def close_push_stream():
         flag = 0
         # 1. 释放video 2.关闭所有进程 3.释放stdout stderr 
         if video is not None:
-            video.release()
+            # cv2
+            # video.release()
+
+            # rtscapture
+            video.stop_read()
         print(f'flag={flag}')
         # process_for_push_stream.kill()
         # process_for_rtsp_server.kill()
@@ -170,11 +175,9 @@ def imshow():
     global root
     global image
     res,img=video.read()
-    if res==True and flag ==1:
+    if flag ==1:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        print(f'img1:{img.shape}')
         img = Image.fromarray(img)
-        print(f'img2:{img.size}')
         img = ImageTk.PhotoImage(img)
         image.image=img
         image['image']=img
@@ -185,7 +188,11 @@ def imshow():
         return 0
 def show_video():
     global video
-    video=cv2.VideoCapture(rtsp_server_url)
+    # video=cv2.VideoCapture(rtsp_server_url)
+    
+    #rtscapture
+    video = RTSCapture.create(rtsp_server_url)
+    video.start_read()
     print(video.isOpened())
     if video.isOpened():
         imshow()
