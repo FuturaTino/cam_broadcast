@@ -101,23 +101,6 @@ todo:
 - 可以用来实现多线程采集和推流
 
 
-
-感悟：
-
-ffmpeg能来推流？ ffmpeg是一个命令行工具,可以进行编码、转换、推流等操作。ffplay能拉流播放。vidgear封装了ffmpeg。
-
-subprocess.PIPE使用时，最好使用bufsize=-1，不然子进程中print会将str放到缓存区，而不是标准输出管道。主进程无法实时输出信息。另外，subprocess使用time.sleep(),必须要手动flush()
-
-print、read、write  -> buffer -> 磁盘或管道
-
-在Python中,print、readline()、read()等方法的读写操作默认是在内存中的缓冲区(buffer)进行的,不涉及磁盘操作。
-
-subprocess 执行时候，如果使用了shell参数，再杀进程时候是杀不掉的。因为杀的是cmd.exe
-
-打包exe nuitka --standalone --onefile myscript.py
-
-删除未用代码 nuitka --optimize --standalone myscript.py
-
 # 评价指标
 
 | 指标        | 简单解释                                                     |
