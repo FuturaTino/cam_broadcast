@@ -134,7 +134,7 @@ def imshow():
             image.image=img
             image['image']=img
             frame_rate_label.configure(text=f'帧率:{video_fps}')
-            delay_label.configure(text=f'延迟:{video_delay}s')
+            delay_label.configure(text=f'延迟:{video_delay}')
             bit_rate_label.configure(text=f'码率:{video_bit_rate}')
             root.after(10,imshow)
         else:
