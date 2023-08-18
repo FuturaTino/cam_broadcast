@@ -44,37 +44,49 @@ def output_video_msg(pipe:subprocess.PIPE):
         # print(1)
         line = pipe.readline()
         if line.startswith('frame'):
-            meta = line.split()
+            meta = line.split('=')
             print(meta)
             try:
                 meta_dict = {
-                    'frame':meta[1],
-                    'frame_rate':meta[3],
-                    'qp':meta[4].split('=')[-1],
-                    'size':meta[5].split('=')[-1],
-                    'time':meta[6].split('=')[-1],
-                    'bit_rate':meta[7].split('=')[-1],
-                    'speed': meta[8].split('=')[-1]
+                    'frame':meta[1].split(' ')[-2],
+                    'frame_rate':meta[2].split(' ')[-2],
+                    'qp':meta[3].split(' ')[0],
+                    'size':meta[4].split(' ')[0],
+                    'time':meta[5].split(' ')[0],
+                    'bit_rate':meta[6].split(' ')[0],
+                    'speed': meta[7]
                 }
             except Exception as e:
                 print(e)
                 print(meta)
-                print(f'len(meta): {len(meta)}')
-                print(f'meta[1]:{meta[1]}')
-                print(f'meta[3]:{meta[3]}')
-                print(f'meta[4]: %s'% meta[4].split('=')[-1])
-                print(f'meta[5]: %s'% meta[5].split('=')[-1])
-                print(f'meta[6]: %s'% meta[6].split('=')[-1])                
-                print(f'meta[7]: %s'% meta[7].split('=')[-1])
-                meta_dict = {
-                    'frame':'N/A',
-                    'frame_rate':meta[3],
-                    'qp':'N/A',
-                    'size':meta[5].split('=')[-1],
-                    'time':meta[6].split('=')[-1],
-                    'bit_rate':meta[7].split('=')[-1],
-                    'speed': 'N/A'
-                }
+                # after 1w frame
+                if meta[0].startswith('frame='):
+                    meta_dict = {
+                        'frame':meta[0].split('=')[-1],
+                        'frame_rate':meta[2],
+                        'qp':meta[3],
+                        'size':meta[4].split('=')[-1],
+                        'time':meta[5].split('=')[-1],
+                        'bit_rate':meta[6].split('=')[-1],
+                        'speed': meta[7].split('=')[-1]
+                    }
+                else:
+                    print(f'len(meta): {len(meta)}')
+                    print(f'meta[1]:{meta[1]}')
+                    print(f'meta[3]:{meta[3]}')
+                    print(f'meta[4]: %s'% meta[4].split('=')[-1])
+                    print(f'meta[5]: %s'% meta[5].split('=')[-1])
+                    print(f'meta[6]: %s'% meta[6].split('=')[-1])                
+                    print(f'meta[7]: %s'% meta[7].split('=')[-1])
+                    meta_dict = {
+                        'frame':'N/A',
+                        'frame_rate':meta[3],
+                        'qp':'N/A',
+                        'size':meta[5].split('=')[-1],
+                        'time':meta[6].split('=')[-1],
+                        'bit_rate':meta[7].split('=')[-1],
+                        'speed': 'N/A'
+                    }
 
 
             frame_label.configure(text=f'总帧数: %s'% meta_dict['frame'])
