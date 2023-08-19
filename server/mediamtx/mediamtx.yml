@@ -292,7 +292,7 @@ paths:
     # SHA256-hashed values can be inserted with the "sha256:" prefix.
     publishPass:
     # IPs or networks (x.x.x.x/24) allowed to publish.
-    publishIPs: [192.168.0.0/16]
+    publishIPs: [192.0.0.0/8]
 
     # Username required to read.
     # SHA256-hashed values can be inserted with the "sha256:" prefix.
@@ -301,7 +301,7 @@ paths:
     # SHA256-hashed values can be inserted with the "sha256:" prefix.
     readPass:
     # IPs or networks (x.x.x.x/24) allowed to read.
-    readIPs: [192.168.0.0/16]
+    readIPs: [192.0.0.0/8]
 
     ###############################################
     # Publisher path parameters (when source is "publisher")
