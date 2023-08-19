@@ -10,10 +10,8 @@ from pathlib import Path
 import subprocess
 import re
 from multiprocessing import Process
-from utils_server import push_stream
+from stream_sender import FFmpegStreamer
 import os 
-from rtscapture import RTSCapture
-
 from rtscapture import RTSCapture
 from config import rtsp_server_url
 
@@ -39,6 +37,8 @@ def output_video_msg(pipe:subprocess.PIPE):
     meta_dict = {}
     print(type(flag))
     # pipe 就是 process.stdout
+
+    # 获取计算好的码率
     while True:
         if flag == 0:
             break 
@@ -88,14 +88,12 @@ def output_video_msg(pipe:subprocess.PIPE):
                         'bit_rate':meta[7].split('=')[-1],
                         'speed': 'N/A'
                     }
-
-
             frame_label.configure(text=f'总帧数: %s'% meta_dict['frame'])
             frame_rate_label.configure(text=f'帧率: %s'% meta_dict['frame_rate'])
             qp_label.configure(text=f'量化参数: %s'% meta_dict['qp'])
             size_label.configure(text=f'有效载荷: %s'% meta_dict['size'])
             time_label.configure(text=f'时间: %s'% meta_dict['time'])
-            bit_rate_label.configure(text=f'比特率: %s'% meta_dict['bit_rate'])
+            bit_rate_label.configure(text=f'编码码率: %s'% meta_dict['bit_rate'])
             speed_label.configure(text=f'编码速度: %s'% meta_dict['speed'])
 
     return 0 
@@ -107,13 +105,17 @@ def start_push_stream():
     global flag 
     global process_for_push_stream
     global process_for_rtsp_server
-    print(f'进入目录:{os.getcwd()}')
+
     os.chdir(root_dir / 'mediamtx')
-    process_for_rtsp_server = subprocess.Popen(['mediamtx.exe'],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    print(f'进入目录:{os.getcwd()}')
+    p1 = process_for_rtsp_server = subprocess.Popen(['mediamtx.exe'],stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    if p1.pid is None:
+        messagebox.showerror('错误','启动rtsp server失败')
+        return 0
     time.sleep(0.5)
     os.chdir(root_dir)
     print(f'进入目录2:{os.getcwd()}')
-    process_for_push_stream = subprocess.Popen(['utils_server.exe'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True)
+    process_for_push_stream = subprocess.Popen(['python','stream_sender.py'],stdout=subprocess.PIPE,stderr=subprocess.PIPE,universal_newlines=True)
  
     flag = 1
     # Print video message
