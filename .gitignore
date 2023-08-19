@@ -7,3 +7,5 @@ build
 dist
 test*.py 
 **.spec
+/temp
+**.zip

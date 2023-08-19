@@ -16,11 +16,10 @@ stream_params = {
     "-rtsp_transport": "tcp",
     "-vcodec": "libx265", # define custom Video encoder h.265 
     "GOP": "15", # 参考帧
-    # "-bufsize": "2000k", 
-    # "-threads": "2",
+
     "-preset": "fast", # for low latency
     "-tune" : "zerolatency", # for low latency
-    "hwaccel": "cuda"
+    'pipe':'', # 用于在推送端获取比特率
 }
 
 stream_params2 = {

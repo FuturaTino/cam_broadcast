@@ -1,0 +1,4 @@
+opencv-python==4.8.0.76
+ffmpeg-python==0.2.0
+vidgear==0.3.1
+pillow==10.0.0

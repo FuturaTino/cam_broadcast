@@ -1,64 +1,105 @@
 
-
-# import required libraries
-from vidgear.gears import CamGear
-from vidgear.gears import WriteGear
+"""H.264 Streaming methods"""
+import numpy as np
+import subprocess as sp
+import time
 import cv2
-from pathlib import Path 
-import subprocess
-import os 
-import sys
-import ffmpeg
-import socket
+# from imageio import get_reader
+import queue
 from threading import Thread
-
-# Instance
-# ffmpeg Push stream settings
-stream_params = {
-    "-f" : "rtsp",
-    "-rtsp_transport": "tcp",
-    "-vcodec": "libx265", # define custom Video encoder h.265 
-    # "-bufsize": "2000k", 
-    "-threads": "2",
-    "-tune" : "zerolatency" # for low latency
-}
-ip_address = socket.gethostbyname(socket.gethostname())
-port= 8554
-rtsp_server_url = f"rtsp://{ip_address}:{port}/mystream"
-
-# Function
-def push_stream():
-    stream = CamGear(source=0).start()
-    writer = WriteGear(output= rtsp_server_url,
-                    compression_mode=True,
-                    logging=True,
-                #    custom_ffmpeg=rf'D:\Program FIles\ffmpeg-6.0-essentials_build\bin\ffmpeg.exe',
-                    **stream_params)  
+class FrameGenerator:
     """
-    yeid frame from stream and write to writer
+generate a frame of random gray scale
     """
-    # loop over
-    while True:
-        # read frames from stream
-        frame = stream.read()
-        cv2.resize(frame, (640, 480))
-        # check for frame if Nonetype
-        if frame is None:
-            break
-        # {do something with the frame here}
-        # frame = cv2.putText(frame, "WriteGear is Cool!", (10, 40),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-        
-        # write frame to writer
-        writer.write(frame)
 
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord("q"):
-            break
-    # Close 
-    cv2.destroyAllWindows()
-    stream.stop()
-    writer.close()
+    def __init__(self, size, source=None):
+        self.size = size
+        self.count = 0
+        self.source = source
+        if self.source is not None:
+            self.cap = cv2.VideoCapture(self.source)
+            if not self.cap.isOpened():
+                print('Video not available.')
+                self.source = None
+
+    def generate(self):
+        """
+    generate a frame
+        :return:
+        """
+        frame_gray = np.random.randint(0, 255) * np.ones(self.size).astype('uint8')
+        if self.source is None:
+            return frame_gray
+        else:
+            ret, frame = self.cap.read()
+            if ret:
+                return frame
+            else:
+                self.cap = cv2.VideoCapture(self.source)
+                return self.generate()
 
 
+class FFmpegStreamer:
+    def __init__(self, target_ip, target_port=8554, fps=25, frame_size=(640,480), rate=20):
+        self.frame_generator = FrameGenerator((640,480, 3), source=0)
+        self.target_ip = target_ip
+        self.target_port = target_port
+        self.fps = fps
+        self.frame_size = frame_size
+        self.size_str = '%dx%d' % (self.frame_size[0], self.frame_size[1])
+        self.rate = rate  # kbps
+        self.rtspUrl = 'rtsp://%s:%d/test' % (self.target_ip, self.target_port)
+        # written according to https://www.cnblogs.com/Manuel/p/15006727.html
+        self.command = [
+            'ffmpeg',
+            '-f', 'rawvideo',  # 强制输入或输出文件格式
+            '-vcodec', 'rawvideo',  # 设置视频编解码器。这是-codec:v的别名
+            '-pix_fmt', 'bgr24',  # 设置像素格式
+            '-s', self.size_str,  # 设置图像大小
+            '-r', str(fps),  # 设置帧率
+            '-i', '-',  # 输入
+            '-timeout', '10',  # 设置TCP连接的等待时间
+            '-b:v', '%dk' % self.rate,  # 设置数据率
+            '-c:v', 'libx264',
+            '-pix_fmt', 'bgr24',
+            '-preset', 'ultrafast',
+            '-rtsp_transport', 'tcp',  # 使用TCP推流
+            '-f','tee', # 复制输出
+            '-map','0:v', # 选择第0个输入的视频流
+            f'[f=rtsp]{self.rtspUrl}|[f=hevc]pipe:1', # 两个输出
+]
+# 成功        
+    
+        self.pipe = sp.Popen(self.command, 
+                             stdin=sp.PIPE,
+                             stdout=sp.PIPE,
+)
+        self.count = 0
+
+    def set_rate(self, rate):
+        self.rate = rate
+        self.command[10] = '%dk' % self.rate
+        self.pipe = sp.Popen(self.command, stdin=sp.PIPE)
+
+    def stream(self):
+        frame = self.frame_generator.generate()
+        self.pipe.stdin.write(frame.tostring())
+        # print('No. %d: ' % self.count, np.mean(frame))
+    
+    def get_bit_rate(self,q:queue.Queue):
+        start_time = time.time()
+        content = self.pipe.stdout.read(1024) # 固定读取1024字节
+        end_time = time.time()
+        duration = end_time - start_time
+        bit_rate = len(content) * 8 / duration 
+        q.put(bit_rate)
+        print(bit_rate)
+        time.sleep(0.01)
 if __name__ == '__main__':
-    push_stream()
+    streamer = FFmpegStreamer('192.168.31.17', fps=30, rate=5)
+    while True:
+        q = queue.Queue()
+        Thread(target=streamer.stream).start()
+        # streamer.get_bit_rate()
+        Thread(target=streamer.get_bit_rate,args=(q,)).start()
+        time.sleep(1/10)
