@@ -121,7 +121,7 @@ def show_bit_rate():
 if __name__ == '__main__':
     q =queue.Queue(50)
     streamer = FFmpegStreamer(fps=30,logging=True) #这里的也是GUI上的内容
-    Thread(target=streamer.push_stream,daemon=True).start()
+    Thread(target=streamer.push_stream).start()
     Thread(get_bit_rate).start()
-    Thread(show_bit_rate,daemon=True).start()
+    Thread(show_bit_rate).start()
     print('启动推送端')
