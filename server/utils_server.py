@@ -20,6 +20,7 @@ stream_params = {
     "-vcodec": "libx265", # define custom Video encoder h.265 
     # "-bufsize": "2000k", 
     "-threads": "2",
+    "-preset": "fast",
     "-tune" : "zerolatency" # for low latency
 }
 ip_address = socket.gethostbyname(socket.gethostname())
