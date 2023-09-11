@@ -60,7 +60,8 @@ ipconfig
 ```python
 python user.py	
 ```
-
+效果图
+![效果图](https://github.com/FuturaTino/TyporaImages/raw/main//TyporaImages/效果图.png)
 
 
 # 任务目标
